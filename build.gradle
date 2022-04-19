@@ -1,0 +1,320 @@
+import org.ultramine.gradle.task.*
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+repositories
+{
+    maven
+    {
+        name 'forge'
+        url 'http://files.minecraftforge.net/maven'
+    }
+    mavenCentral()
+    maven
+    {
+        name 'sonatypeSnapshot'
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven
+    {
+        name 'minecraft'
+        url 'https://libraries.minecraft.net/'
+    }
+}
+
+dependencies
+{
+    compile 'net.minecraft:launchwrapper:1.11'
+    compile 'com.google.code.findbugs:jsr305:1.3.9'
+    compile 'org.ow2.asm:asm-debug-all:5.0.3'
+    compile 'com.typesafe.akka:akka-actor_2.11:2.3.3'
+    compile 'com.typesafe:config:1.2.1'
+    compile 'org.scala-lang:scala-actors-migration_2.11:1.1.0'
+    compile 'org.scala-lang:scala-compiler:2.11.1'
+    compile 'org.scala-lang.plugins:scala-continuations-library_2.11:1.0.2'
+    compile 'org.scala-lang.plugins:scala-continuations-plugin_2.11.1:1.0.2'
+    compile 'org.scala-lang:scala-library:2.11.1'
+    compile 'org.scala-lang:scala-parser-combinators_2.11:1.0.1'
+    compile 'org.scala-lang:scala-reflect:2.11.1'
+    compile 'org.scala-lang:scala-swing_2.11:1.0.1'
+    compile 'org.scala-lang:scala-xml_2.11:1.0.2'
+    compile 'net.sf.jopt-simple:jopt-simple:4.5'
+    compile 'lzma:lzma:0.0.1'
+    compile 'com.mojang:realms:1.3.5'
+    compile 'org.apache.commons:commons-compress:1.8.1'
+    compile 'org.apache.httpcomponents:httpclient:4.3.3'
+    compile 'commons-logging:commons-logging:1.1.3'
+    compile 'org.apache.httpcomponents:httpcore:4.3.2'
+    compile 'java3d:vecmath:1.3.1'
+    compile 'net.sf.trove4j:trove4j:3.0.3'
+    compile 'com.ibm.icu:icu4j-core-mojang:51.2'
+    compile 'com.paulscode:codecjorbis:20101023'
+    compile 'com.paulscode:codecwav:20101023'
+    compile 'com.paulscode:libraryjavasound:20101123'
+    compile 'com.paulscode:librarylwjglopenal:20100824'
+    compile 'com.paulscode:soundsystem:20120107'
+    compile 'io.netty:netty-all:4.0.10.Final'
+    compile 'com.google.guava:guava:16.0'
+    compile 'org.apache.commons:commons-lang3:3.2.1'
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-codec:commons-codec:1.9'
+    compile 'net.java.jinput:jinput:2.0.5'
+    compile 'net.java.jutils:jutils:1.0.0'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.mojang:authlib:1.5.16'
+    compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+    compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'
+    compile 'net.sf.jopt-simple:jopt-simple:4.5'
+    compile 'org.yaml:snakeyaml:1.21'
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'org.avaje:ebean:2.7.3'
+    compile 'jline:jline:2.6'
+    compile 'net.md-5:SpecialSource:1.7-SNAPSHOT'
+    compile 'net.sourceforge.argo:argo:2.25'
+    compile 'org.fusesource.jansi:jansi:1.8'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile 'mysql:mysql-connector-java:5.1.14'
+    compile 'javax.persistence:persistence-api:1.0.2'
+    compile 'org.lwjgl.lwjgl:lwjgl:2.9.1'
+    compile 'org.lwjgl.lwjgl:lwjgl_util:2.9.1'
+    compile 'tv.twitch:twitch:5.16'
+
+    testCompile 'junit:junit:4.5'
+}
+
+sourceSets
+{
+    main
+    {
+        java
+        {
+            srcDir 'src/main/java/'
+            srcDir '/C:/Users/s5a4ed1sa7/Desktop/UltraCrucible/src/main/java/'
+        }
+        resources
+        {
+            srcDir 'src/main/resources/'
+            srcDir '/C:/Users/s5a4ed1sa7/Desktop/UltraCrucible/src/main/resources/'
+            srcDir '/C:/Users/s5a4ed1sa7/Desktop/UltraCrucible/build/extractedResources/'
+        }
+    }
+    test
+    {
+        java
+        {
+            srcDir '/C:/Users/s5a4ed1sa7/Desktop/UltraCrucible/src/test/java/'
+            srcDir '/C:/Users/s5a4ed1sa7/Desktop/UltraCrucible/src/test/java/'
+        }
+    }
+}
+
+jar { exclude 'GradleStart*', 'net/minecraftforge/gradle/**' }
+
+def links = []
+def dupes = []
+eclipse.project.file.withXml { provider ->
+    def node = provider.asNode()
+    links = []
+    dupes = []
+    node.linkedResources.link.each { child ->
+        def path = child.location.text()
+        if (path in dupes) {
+            child.replaceNode {}
+        } else {
+            dupes.add(path)
+            def newName = path.split('/')[-2..-1].join('/')
+            links += newName
+            child.replaceNode {
+                link{
+                    name(newName)
+                    type('2')
+                    location(path)
+                }
+            }
+        }
+    }
+}
+
+eclipse.classpath.file.withXml {
+    def node = it.asNode()
+    node.classpathentry.each { child -> 
+        if (child.@kind == 'src' && !child.@path.contains('/')) child.replaceNode {}
+        if (child.@path in links) links.remove(child.@path)
+    }
+    links.each { link -> node.appendNode('classpathentry', [kind:'src', path:link]) }
+}
+tasks.eclipseClasspath.dependsOn 'eclipseProject' //Make them run in correct order
+
+repositories {
+    clear()
+     maven {
+            name = "juanmuscaria"
+            url = "https://github.com/juanmuscaria/maven/raw/master"
+        }
+    maven {
+        name "prok"
+        url "https://github.com/juanmuscaria/maven/raw/master/ThermosLibs"
+    }
+    maven {
+        name 'forge'
+        url 'https://maven.minecraftforge.net/'
+    }
+    maven {
+        name 'minecraft'
+        url 'https://libraries.minecraft.net/'
+    }
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+dependencies {
+    compile 'pw.prok:KBootstrap:0.3.2'
+    compile 'pw.prok:Damask:0.1.2'
+    compile 'commons-cli:commons-cli:1.3'
+    compile 'org.slf4j:slf4j-simple:1.6.2'
+    compile 'org.eclipse.jetty:jetty-servlet:9.0.3.v20130506'
+    compile 'commons-io:commons-io:2.4'
+    compile 'net.md-5:SpecialSource:1.7.4'
+    compile 'net.sf.opencsv:opencsv:2.3'
+    compile 'com.beust:jcommander:1.30'
+    compile 'net.minecraft:launchwrapper:1.12'
+    compile 'com.typesafe.akka:akka-actor_2.11:2.3.3'
+    compile 'com.typesafe:config:1.2.1'
+    compile 'org.scala-lang:scala-actors-migration_2.11:1.1.0'
+    compile 'org.scala-lang.plugins:scala-continuations-plugin_2.11.2:1.0.2'
+    compile 'org.scala-lang:scala-compiler:2.11.7'
+    compile 'org.scala-lang.plugins:scala-continuations-library_2.11:1.0.2'
+    compile 'org.scala-lang:scala-reflect:2.11.7'
+    compile 'org.scala-lang:scala-swing:2.11.0-M7'
+    compile 'org.scala-lang:scala-actors:2.11.0'
+    compile 'org.scala-lang.modules:scala-xml_2.11:1.0.4'
+    compile 'org.scala-lang.modules:scala-parser-combinators_2.11:1.0.4'
+    compile 'org.scala-lang:scala-library:2.11.7'
+    compile 'org.scala-lang:scala-parser-combinators:2.11.0-M4'
+    compile 'org.scala-lang:scala-xml:2.11.0-M4'
+    compile 'net.sf.jopt-simple:jopt-simple:5.0.1'
+    compile 'lzma:lzma:0.0.1'
+    compile 'org.yaml:snakeyaml:1.9'
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'org.avaje:ebean:2.7.3'
+    compile 'jline:jline:2.6'
+    compile 'net.sourceforge.argo:argo:2.25'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile 'mysql:mysql-connector-java:5.1.14'
+    compile 'javax.persistence:persistence-api:1.0.2'
+    compile 'pw.prok:KImagine:0.2.0'
+    compile 'org.apache.httpcomponents:httpclient:4.4.1'
+    compile 'net.openhft:affinity:3.0.1'
+    compile 'org.fusesource.jansi:jansi:1.11'
+    compile 'com.koloboke:koloboke-impl-jdk8:1.0.0'
+    compile 'java3d:vecmath:1.3.1'
+    compile 'it.unimi.dsi:fastutil:8.2.2'
+    compile 'org.ow2.asm:asm-debug-all:5.1'
+    compile 'com.google.guava:guava:19.0'
+    compile 'org.apache.httpcomponents:httpcore:4.4.1'
+    compile 'commons-logging:commons-logging:1.2'
+    compile 'commons-codec:commons-codec:1.9'
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'net.java.dev.jna:jna-platform:4.1.0'
+    compile 'net.java.dev.jna:jna:4.1.0'
+    compile 'org.kohsuke.jetbrains:annotations:9.0'
+    compile 'com.koloboke:koloboke-impl-common-jdk8:1.0.0'
+    compile 'com.koloboke:koloboke-api-jdk8:1.0.0'
+}
+
+task injectVersion(type: SpeicialClassTransformTask) {
+    dependsOn tasks.compileJava
+    inputDir = tasks.compileJava.destinationDir
+    replace {
+        replaceIn 'io.github.crucible.CrucibleModContainer'
+        replace '@version@', version
+    }
+}
+
+task reobf(type: ReobfTask) {
+    dependsOn tasks.compileJava, tasks.injectVersion
+    classpath = sourceSets.main.compileClasspath;
+    addSrg('conf/mcp2notch.srg')
+    addSrg('conf/bukkit.srg')
+    inputDir = tasks.compileJava.destinationDir
+    overrideInputDir = tasks.injectVersion.outputDir
+}
+
+task sidesplit(type: SideSplitTask) {
+    dependsOn tasks.reobf
+    inputDir = tasks.reobf.outputDir
+}
+
+task processServerResources(type: ProcessResources) {
+    from sourceSets.main.resources.srcDirs
+    into new File(buildDir, 'resources_server')
+    exclude 'assets/minecraft/font'
+    exclude 'assets/minecraft/shaders'
+    exclude 'assets/minecraft/texts'
+    exclude 'assets/minecraft/textures'
+    exclude 'assets/fml/textures'
+}
+
+task processClientResources(type: ProcessResources) {
+    from sourceSets.main.resources.srcDirs
+    into new File(buildDir, 'resources_client')
+    exclude 'org/ultramine/defaults'
+}
+
+task jar_server(type: Jar) {
+    dependsOn(tasks.sidesplit, tasks.processServerResources)
+    from fileTree(tasks.sidesplit.getServerClasses()), tasks.processServerResources
+    classifier = 'server'
+    manifest {
+        attributes(
+                'Main-Class': 'cpw.mods.fml.relauncher.ServerLaunchWrapper',
+                'TweakClass': 'cpw.mods.fml.common.launcher.FMLTweaker',
+                'Class-Path': configurations.compile.collect { 'libraries/' + it.getName() }.join(' '),
+                'Specification-Vendor'  : 'Bukkit Team',
+                'Specification-Title'   : 'Bukkit',
+                'Specification-Version' : '1.7.10-R0.1-SNAPSHOT',
+                'Forge-Version'         : '10.13.4.1614',
+                'Thermos-Git-Branch'    : 'stable',
+                'Thermos-Git-Hash'      : '',
+                'Thermos-Group'         : project.group,
+                'Thermos-Channel'       : project.name,
+                'Thermos-Version'       : project.version,
+                'Thermos-Legacy'        : 'false'
+        )
+    }
+}
+
+task jar_client(type: Jar) {
+    dependsOn(tasks.sidesplit, tasks.processClientResources)
+    from fileTree(tasks.sidesplit.getClientClasses()), tasks.processClientResources
+    classifier = 'client'
+}
+
+task jar_universal(type: Jar) {
+    dependsOn(tasks.reobf, tasks.processResources)
+    from tasks.reobf.getOutputDir(), tasks.processResources
+    classifier = 'universal'
+}
+
+task dumpLibs(type: Copy) {
+    into "$buildDir/libs/libraries"
+    from configurations.runtime
+}
+
+tasks.build.dependsOn tasks.dumpLibs, tasks.jar_server
+
+defaultTasks 'build'
+
+group = 'cruciblemc'
+
+ext.buildInfoCached = null;
+
+ext.mcVersion = "1.7.10"
+ext.forgeVersion = "1614"
+ext.revision = "1.0.7"
+ext.crucibleVersion = "5.2"
+System.setProperty("file.encoding", "UTF-8")
